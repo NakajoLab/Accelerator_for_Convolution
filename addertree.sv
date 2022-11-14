@@ -12,9 +12,9 @@ module adder_tree#(
     genvar 
     generate
         for() begin: add
-            always_ff @(posedge clk) begin
-                data[]
-            end
+            // always_ff @(posedge clk) begin
+            //     data[]
+            // end
         end
     endgenerate
 endmodule
