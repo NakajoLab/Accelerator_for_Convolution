@@ -1,36 +1,37 @@
-`default_nettype none
-module tb_addertree();
-reg clk;
-reg rst_n;
-logic [INPUT_NUM - 1:0][WIDTH - 1:0] indata;
+module tb_sample();
+localparam INPUT_NUM = 9;
+localparam WIDTH = 32;
+logic clk;
+logic rst;
+logic [INPUT_NUM - 1:0][WIDTH - 1:0] in;
 logic [WIDTH - 1:0] res;
 
-adder_tree #(
-    .WIDTH(32),
-    .INPUT_NUM(8),
-    .STAGE_NUM($clog2(INPUT_NUM)) 
-) dut(.clk(clk), .rst(rst_n), .indata(indata), .res(res));
-
-localparam CLK_PERIOD = 10;
-always #(CLK_PERIOD/2) clk=~clk;
-
+localparam CLK_PERIOD = 2;
 initial begin
-    $dumpfile("tb_addertree.vcd");
-    $dumpvars(0, tb_addertree);
+    clk <= 0;
+    forever #(CLK_PERIOD/2) clk=~clk;
 end
 
-always @(posedge clk) begin
-    $display("%d", data[2]);
-end
+sample dut(         .clk(clk), 
+                    .rst(rst), 
+                    .indata(in),
+                    .res(res));
 
 initial begin
-    #1 rst_n<=1'bx;clk<=1'bx;
-    #(CLK_PERIOD*3) rst_n<=1;
-    #(CLK_PERIOD*3) rst_n<=0;clk<=0;
-    repeat(5) @(posedge clk) indata[0] = 32;
-    repeat(10) @(posedge clk);
+    $dumpfile("tb_sample.vcd");
+    $dumpvars(0, tb_sample);
+end
     
-    $finish(2);
+initial begin
+    rst = 0; in <= 0; #5;
+    repeat(5) @(posedge clk) rst = 1;
+    repeat(2) @(posedge clk) rst = 0;
+    repeat(2) @(posedge clk) in[0] <= -4;
+    @(posedge clk) in[1] <= 2;
+    repeat(2) @(posedge clk) in[8] <= 1;
+    #10;
+    $finish;
 end
 
 endmodule
+`default_nettype wire
