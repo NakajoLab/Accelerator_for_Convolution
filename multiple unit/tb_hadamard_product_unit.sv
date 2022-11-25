@@ -1,4 +1,4 @@
-module tb_convolution_unit#(
+module tb_hadamard_product_unit#(
     parameter WIDTH = 32,
     parameter SIZE = 9
 )();
@@ -14,12 +14,13 @@ hadamard_product_unit dut(
 );
 
 initial begin
-    $dumpfile("tb_hadamard_product.vcd");
-    $dumpvars(0, tb_hadamard_product);
+    $dumpfile("tb_hadamard_product_unit.vcd");
+    $dumpvars(0, tb_hadamard_product_unit);
 end
 
 initial begin
     kernel = 0; patch = 0; #10;
+    kernel[0] = 10; patch[0] = 10; #100;
 
 
     $finish;

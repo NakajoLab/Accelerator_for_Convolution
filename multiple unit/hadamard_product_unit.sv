@@ -4,15 +4,14 @@ module hadamard_product_unit#(
 )(
     input logic [SIZE - 1:0][WIDTH - 1:0] kernel,
     input logic [SIZE - 1:0][WIDTH - 1:0] patch,
-    output logic [SIZE - 1:0][WIDTH - 1:0] res
-);
+    output logic [SIZE - 1:0][WIDTH - 1:0] res);
     genvar i;
     generate
         for(i = 0; i < SIZE; i++) begin: mul
             multiple_unit i_multiple(
                 .a(kernel[i]),
                 .b(patch[i]),
-                .y(res[i]),
+                .y(res[i])
             );
         end
     endgenerate
