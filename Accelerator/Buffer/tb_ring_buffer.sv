@@ -57,7 +57,7 @@ initial begin
     #(CLK_PERIOD)       test(1, 1, 1, 1, 1, 1);
     #(CLK_PERIOD)       test(1, 0, 2, 2, 2, 2);
     #(CLK_PERIOD)       test(0, 1, 3, 3, 3, 3);
-    #(CLK_PERIOD)       test(0, 1, 4, 4, 4, 4);
+    #(CLK_PERIOD)       test(0, 0, 4, 4, 4, 4);
     #(CLK_PERIOD)       test(0, 1, 5, 5, 5, 5);
     #(CLK_PERIOD * 10);
     $finish();

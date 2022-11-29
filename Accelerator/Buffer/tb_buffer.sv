@@ -14,16 +14,14 @@ logic [NUM_OF_MUL - 1:0][DATA_WIDTH - 1:0] dout;
  
 buffer dut( .*);
 
-localparam CLK_PERIOD = 2;
-always #(CLK_PERIOD/2) clk=~clk;
-
 initial begin
     $dumpfile("tb_buffer.vcd");
     $dumpvars(0, tb_buffer);
 end
-
+localparam CLK_PERIOD = 2;
 initial begin
-    
+    clk <= 0;
+    forever #(CLK_PERIOD/2) clk=~clk;
     $finish();
 end
 

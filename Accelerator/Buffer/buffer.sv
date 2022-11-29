@@ -78,7 +78,6 @@ module buffer#(
 
     // Almost Empty Flag
     assign almost_empty_flag = ((rptr == (wptr - 1)) || ((rptr == ~0) && (wptr == 1)) || ((rptr == ~0 - 1) && wptr == 0))? 1 : 0;
-
     // Empty Flag
     always_ff @(posedge clk or posedge rst) begin
         if(rst)

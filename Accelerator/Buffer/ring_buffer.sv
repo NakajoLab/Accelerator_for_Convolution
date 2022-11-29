@@ -71,7 +71,6 @@ module ring_buffer#(
                 empty_flag_reg <= 0;
         end
     end
-
     assign wptr_check = wptr;
     assign rptr_check = rptr;
 endmodule
