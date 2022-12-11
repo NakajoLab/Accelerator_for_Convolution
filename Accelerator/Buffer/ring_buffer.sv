@@ -1,4 +1,4 @@
-  module ring_buffer#(
+module ring_buffer#(
     parameter DATA_WIDTH = 4,
     parameter BUFFER_SIZE = 4,
     parameter DATA_OF_SET = 4
@@ -10,8 +10,7 @@
     input logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] din,
     output logic full_flag,
     output logic empty_flag,
-    output logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout,
-    // output logic [$clog2(BUFFER_SIZE) - 1:0] wptr_check, rptr_check
+    output logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout
 );
     logic [BUFFER_SIZE - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] buffer;
     logic [$clog2(BUFFER_SIZE) - 1:0] wptr, rptr;
@@ -52,9 +51,5 @@
             end
         end
     end
-    
-    // for test
-    // assign wptr_check = wptr;
-    // assign rptr_check = rptr;
 
 endmodule
