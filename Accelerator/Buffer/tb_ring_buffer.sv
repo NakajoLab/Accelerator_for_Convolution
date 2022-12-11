@@ -12,6 +12,7 @@ logic full_flag;
 logic empty_flag;
 logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout;
 logic [$clog2(BUFFER_SIZE) - 1:0] wptr_check, rptr_check;
+logic [DATA_WIDTH - 1:0] fifo_check0;
 
 ring_buffer dut(
                     .clk(clk),
@@ -23,7 +24,8 @@ ring_buffer dut(
                     .empty_flag(empty_flag),
                     .dout(dout),
                     .wptr_check(wptr_check),
-                    .rptr_check(rptr_check)
+                    .rptr_check(rptr_check),
+                    .fifo_check0(fifo_check0)
 );
 
 localparam CLK_PERIOD = 2;
