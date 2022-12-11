@@ -1,92 +1,81 @@
 module buffer#(
-    parameter DATA_WIDTH = 32,
-    parameter BUFFER_SIZE = 8,
-    parameter KERNEL_SIZE = 9,
-    parameter NUM_OF_MUL = 16,
-    parameter DATA_OF_SET = 128,
-    parameter INPUTNUM_OF_SET = 1,
-    parameter OUTPUTNUM_OF_SET = 1
+    parameter DATA_WIDTH = 4,
+    parameter BUFFER_SIZE = 4,
+    parameter DATA_OF_SET = 4,
+    parameter IN_NUM_OF_SET = 4,
+    parameter OUT_NUM_OF_SET = 3
 )(
     input logic clk,
     input logic rst,
     input logic wen,
-    input logic [INPUTNUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] din,
+    input logic [IN_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] din,
     output logic full_flag,
-    output logic [INPUTNUM_OF_SET - 1:0][DATA_OF_SET - 3:0][DATA_WIDTH - 1:0] dout
+    output logic [OUT_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout,
+    output logic [OUT_NUM_OF_SET - 1:0] valid
 );
-    logic [INPUTNUM_OF_SET - 1:0][BUFFER_SIZE - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] buffer;
-    logic [INPUTNUM_OF_SET - 1:0] full_flag_reg;
-    logic [INPUTNUM_OF_SET - 1:0][BUFFER_SIZE - 1:0] wptr, rptr;
-    logic carry_wptr;
-    logic carry_rptr;
-    logic next_wptr;
-    logic next_rptr;
-    logic [INPUTNUM_OF_SET - 1:0] dout_ctrl; // どこからdoutにoutputさせるか
 
-    // Output Assignment
+    logic [IN_NUM_OF_SET - 1:0] full_flag_tmp;
+    logic [IN_NUM_OF_SET - 1:0] empty_flag_tmp;
+    logic [IN_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout_tmp;
+    logic [IN_NUM_OF_SET - 1:0] ren;
+    logic [$clog2(IN_NUM_OF_SET) - 1:0] index;
+    logic [$clog2(IN_NUM_OF_SET) - 1:0] index_reg;
+    logic [$clog2(IN_NUM_OF_SET) - 1:0] index_after;
 
-    assign full_flag = |full_flag_reg;
+    assign full_flag = |full_flag_tmp;
+    assign index_after = index + OUT_NUM_OF_SET;
 
     genvar i;
     generate
-    for(i = 0;i < OUTPUTNUM_OF_SET;i++) begin
-        assign dout[i] = buffer[dout_ctrl + i][rptr];
-    end
+        for(i = 0;i < IN_NUM_OF_SET;i++) begin
+            ring_buffer #(
+                .DATA_WIDTH(DATA_WIDTH),
+                .BUFFER_SIZE(BUFFER_SIZE),
+                .DATA_OF_SET(DATA_OF_SET)
+            ) i_buffer(
+                                .clk(clk),
+                                .rst(rst),
+                                .wen(wen),
+                                .ren(ren[i]),
+                                .din(din[i]),
+                                .full_flag(full_flag_tmp[i]),
+                                .empty_flag(empty_flag_tmp[i]),
+                                .dout(dout_tmp[i])
+            );
+            
+            assign ren[i] = empty_flag_tmp[i] ? 1'b0 :
+                              (index >= index_after) ? 
+                              ((i >= index) || (i < index_after)) :  
+                              ((i >= index) && (i < index_after));
+        end
+
+        for(i = 0;i < OUT_NUM_OF_SET;i++) begin
+            assign dout[i] = dout_tmp[(IN_NUM_OF_SET - 1) & (index_reg + i)];
+        end                                 
     endgenerate
 
+    // Index for Output
     always_ff @(posedge clk or posedge rst) begin
-        if(rst)
-            dout_ctrl <= 0;
-        else 
-            dout_ctrl <= dout_ctrl + OUTPUTNUM_OF_SET;
+        if(rst || |empty_flag_tmp) begin
+            index <= 0;
+            index_reg <= 0;
+        end else begin
+            index <= index + OUT_NUM_OF_SET;
+            index_reg <= index;
+        end
     end
-
+    
+    integer n;
+    
+    // Valid
     integer j;
-    // Input
-    always_ff @(posedge clk) begin
-        for(j=0;j<INPUTNUM_OF_SET;j++) begin
-            buffer[j][wptr[j]] <= din[j];
-        end
-    end
-
-    // Write Pointer & Read Pointer
     always_ff @(posedge clk or posedge rst) begin
-        for(j=0;j<INPUTNUM_OF_SET;j++) begin
-            if(rst) begin
-                wptr <= 0;
-                rptr <= ~0;
-            end
-            else if(wen && !full_flag_reg[j])
-                wptr <= wptr + 1;
-            else if(!empty_flag_reg)
-                rptr <= rptr + 1;
+        for(j = 0;j < OUT_NUM_OF_SET;j++) begin
+            if(rst)
+                valid[j] <= 1'b0;
+            else
+                valid[j] <= ren[(IN_NUM_OF_SET - 1) & (index + j)];
         end
     end
-
-    // Full Flag
-    always_ff @(posedge clk or posedge rst) begin
-        if(rst)
-            full_flag_reg <= 0;
-        else begin
-            // 次のクロックでwptrがrptrを超える場合
-            if(()               
-                full_flag_reg <= 1;
-            else if(full_flag_reg && ) // 解消されたらフラグ戻す
-                full_flag_reg <= 0;
-        end
-    end
-
-    // Almost Empty Flag
-    assign almost_empty_flag = ((rptr == (wptr - 1)) || ((rptr == ~0) && (wptr == 1)) || ((rptr == ~0 - 1) && wptr == 0))? 1 : 0;
-    // Empty Flag
-    always_ff @(posedge clk or posedge rst) begin
-        if(rst)
-            empty_flag_reg <= 1;
-        else begin
-            if(almost_empty_flag && !wen && ren)
-                empty_flag_reg <= 1;
-            else if(empty_flag_reg && wen)
-                empty_flag_reg <= 0;
-        end
-    end
+    
 endmodule
