@@ -3,18 +3,19 @@ module ring_buffer#(
     parameter BUFFER_SIZE = 4,
     parameter DATA_OF_SET = 4
 )(
-    input logic clk,
-    input logic rst,
-    input logic wen,
-    input logic ren,
-    input logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] din,
-    output logic full_flag,
-    output logic empty_flag,
-    output logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout
+    input logic                                                     clk,
+    input logic                                                     rst,
+    input logic                                                     wen,
+    input logic                                                     ren,
+    input logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0]               din,
+    output logic                                                    full_flag,
+    output logic                                                    empty_flag,
+    output logic [DATA_OF_SET - 1:0][DATA_WIDTH - 1:0]              dout
 );
-    logic [BUFFER_SIZE - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] buffer;
-    logic [$clog2(BUFFER_SIZE) - 1:0] wptr, rptr;
-    
+
+    logic [BUFFER_SIZE - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0]  buffer;
+    logic [$clog2(BUFFER_SIZE) - 1:0]                               wptr, rptr;
+
 
     // Output Assignment
     assign dout = buffer[rptr];
