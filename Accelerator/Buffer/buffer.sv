@@ -1,26 +1,27 @@
 module buffer#(
-    parameter DATA_WIDTH = 4,
-    parameter BUFFER_SIZE = 4,
-    parameter DATA_OF_SET = 4,
-    parameter IN_NUM_OF_SET = 4,
+    parameter DATA_WIDTH = 32,
+    parameter BUFFER_SIZE = 32,
+    parameter DATA_OF_SET = 128,
+    parameter IN_NUM_OF_SET = 16,
     parameter OUT_NUM_OF_SET = 3
 )(
-    input logic clk,
-    input logic rst,
-    input logic wen,
-    input logic [IN_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] din,
+    input logic                                                                 clk,
+    input logic                                                                 rst,
+    input logic                                                                 wen,
+    input logic [IN_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0]      din,
     output logic full_flag,
-    output logic [OUT_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout,
-    output logic [OUT_NUM_OF_SET - 1:0] valid
+    output logic [OUT_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0]    dout,
+    output logic [OUT_NUM_OF_SET - 1:0]                                         valid
 );
 
-    logic [IN_NUM_OF_SET - 1:0] full_flag_tmp;
-    logic [IN_NUM_OF_SET - 1:0] empty_flag_tmp;
-    logic [IN_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0] dout_tmp;
-    logic [IN_NUM_OF_SET - 1:0] ren;
-    logic [$clog2(IN_NUM_OF_SET) - 1:0] index;
-    logic [$clog2(IN_NUM_OF_SET) - 1:0] index_reg;
-    logic [$clog2(IN_NUM_OF_SET) - 1:0] index_after;
+    logic [IN_NUM_OF_SET - 1:0]                                                 full_flag_tmp;
+    logic [IN_NUM_OF_SET - 1:0]                                                 empty_flag_tmp;
+    logic [IN_NUM_OF_SET - 1:0][DATA_OF_SET - 1:0][DATA_WIDTH - 1:0]            dout_tmp;
+    logic [IN_NUM_OF_SET - 1:0]                                                 ren;
+    logic [$clog2(IN_NUM_OF_SET) - 1:0]                                         index;
+    logic [$clog2(IN_NUM_OF_SET) - 1:0]                                         index_reg;
+    logic [$clog2(IN_NUM_OF_SET) - 1:0]                                         index_after;
+
 
     assign full_flag = |full_flag_tmp;
     assign index_after = index + OUT_NUM_OF_SET;
@@ -56,7 +57,7 @@ module buffer#(
 
     // Index for Output
     always_ff @(posedge clk or posedge rst) begin
-        if(rst || |empty_flag_tmp) begin
+        if(rst || &empty_flag_tmp) begin
             index <= 0;
             index_reg <= 0;
         end else begin
