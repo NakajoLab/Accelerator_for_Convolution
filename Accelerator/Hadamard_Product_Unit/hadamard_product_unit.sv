@@ -2,11 +2,12 @@ module hadamard_product_unit#(
     parameter WIDTH = 32,
     parameter SIZE = 9
 )(
-    input logic [SIZE - 1:0][WIDTH - 1:0] kernel,
-    input logic [SIZE - 1:0][WIDTH - 1:0] patch,
-    input logic buffer_valid,
-    output logic mul_valid,
-    output logic [SIZE - 1:0][WIDTH - 1:0] dout);
+    input logic [SIZE - 1:0][WIDTH - 1:0]               kernel,
+    input logic [SIZE - 1:0][WIDTH - 1:0]               patch,
+    input logic                                         buffer_valid,
+    output logic                                        mul_valid,
+    output logic [SIZE - 1:0][WIDTH - 1:0]              dout
+);
 
     genvar i;
     generate
