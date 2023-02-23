@@ -4,16 +4,16 @@ module adder_tree#(
 )(
     input logic clk,
     input logic rst,
-    input logic [KERNEL_SIZE - 1:0][WIDTH - 1:0] din,
-    input logic mul_valid,
-    output logic adder_valid,
-    output logic [WIDTH - 1:0] dout
+    input logic [KERNEL_SIZE - 1:0][WIDTH - 1:0]            din,
+    input logic                                             mul_valid,
+    output logic                                            adder_valid,
+    output logic [WIDTH - 1:0]                              dout
 );
 
-    logic [KERNEL_SIZE - 1:0][WIDTH - 1:0] input_pipeline_reg;
-    logic [6:0][WIDTH - 1:0] midway_adder_wire;
-    logic mul_valid_reg;
-    logic [WIDTH - 1:0] dout_tmp; 
+    logic [KERNEL_SIZE - 1:0][WIDTH - 1:0]                  input_pipeline_reg;
+    logic [6:0][WIDTH - 1:0]                                midway_adder_wire;
+    logic                                                   mul_valid_reg;
+    logic [WIDTH - 1:0]                                     dout_tmp; 
 
     adder #(
         .WIDTH(WIDTH)
